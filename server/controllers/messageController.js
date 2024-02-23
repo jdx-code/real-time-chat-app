@@ -1,6 +1,6 @@
 const messageModel = require("../models/messageModel")
 
-// createMessage
+// Function for creating a message in a chat
 const createMessage = async(req, res) => {
     
     const { chatId, senderId, text } = req.body
@@ -22,8 +22,7 @@ const createMessage = async(req, res) => {
     }
 }
 
-// getMessages
-
+// Function for getting all messages of a Chat
 const getMessages = async(req, res) => {
 
     const { chatId } = req.params
