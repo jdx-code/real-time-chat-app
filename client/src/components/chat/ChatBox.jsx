@@ -5,14 +5,20 @@ import { ChatContext } from '../../context/ChatContext'
 import { useFetchRecipientUser } from '../../hooks/useFetchRecipient'
 import moment from "moment"
 import InputEmoji from "react-input-emoji"
+import { useRef } from 'react'
+import { useEffect } from 'react'
 
 const ChatBox = () => {
 
   const { user } = useContext(AuthContext)
   const { currentChat, messages, isMessagesLoading, sendTextMessage } = useContext(ChatContext)
   const { recipientUser } = useFetchRecipientUser(currentChat, user)
-
   const [textMessage, setTextMessage] = useState("")
+  const scroll = useRef()
+
+  useEffect(() => {
+    scroll.current?.scrollIntoView({ behavior: "smooth"})
+  }, [messages])
 
   if(!recipientUser) 
     return (
@@ -33,7 +39,9 @@ const ChatBox = () => {
         {messages &&
           messages.map((message, index) => (
             <Stack key={index} className={`${message?.senderId === user?._id ? 
-            "message self align-self-end flex-grow-0" : "message align-self-start flex-grow-0"}`}>
+            "message self align-self-end flex-grow-0" : "message align-self-start flex-grow-0"}`}
+            ref={scroll}
+            >
                 <span>{message.text}</span>
                 <span>{moment(message.createdAt).calendar()}</span>                
             </Stack>
