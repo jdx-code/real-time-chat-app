@@ -20,6 +20,7 @@ export const ChatContextProvider = ({ children, user }) => {
     const [socket, setSocket] = useState(null)
     const [onlineUsers, setOnlineUsers] = useState([])
     const [notifications, setNotifications] = useState([])
+    const [allUsers, setAllUsers] = useState([])
 
     useEffect(() => {
         const newSocket = io("http://localhost:3000/")
@@ -102,6 +103,7 @@ export const ChatContextProvider = ({ children, user }) => {
             })
 
             setPotentialChats(pChats)
+            setAllUsers(response)
         }
 
         getUsers()
@@ -203,6 +205,7 @@ export const ChatContextProvider = ({ children, user }) => {
                 sendTextMessage,
                 onlineUsers,
                 notifications,
+                allUsers,
             }}
         >
             {children}
