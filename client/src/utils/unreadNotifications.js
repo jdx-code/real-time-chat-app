@@ -1,3 +1,3 @@
-export const unreadNotificationsFunc = (notifications) => {
+export const unreadNotificationsFx = (notifications) => {
     return notifications.filter((notification) => notification.isRead === false)
 }

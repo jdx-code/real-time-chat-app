@@ -1,22 +1,22 @@
 import { useState, useContext } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 import { ChatContext } from '../../context/ChatContext'
-import { unreadNotificationsFunc } from '../../utils/unreadNotifications'
+import { unreadNotificationsFx } from '../../utils/unreadNotifications'
 import moment from 'moment'
 
 const Notification = () => {
 
   const [isOpen, setIsOpen] = useState(false)  
   const {user} = useContext(AuthContext)
-  const {notifications, userChats, allUsers} = useContext(ChatContext)
+  const {notifications, userChats, allUsers, markAllNotificationsAsRead, markNotificationAsRead} = useContext(ChatContext)
 
-  const unreadNotifications = unreadNotificationsFunc(notifications)
+  const unreadNotifications = unreadNotificationsFx(notifications)
   const modifiedNotifications = notifications.map((notification) => {
     const sender = allUsers.find(user => user._id === notification.senderId)
 
     return {
         ...notification,
-        senderName : sender?.name
+        senderName: sender?.name
     }
   })
 
@@ -39,23 +39,33 @@ const Notification = () => {
                 </span>
             )}
         </div>
-        {isOpen ? <div className='notifications-box'>
+        {isOpen ? (<div className='notifications-box'>
             <div className='notifications-header'>
                 <h3>Notifications</h3>
-                <div className='mark-as-read'>
+                <div className='mark-as-read' onClick={() => markAllNotificationsAsRead(notifications)}>
                     Mark all as read
                 </div>                
             </div>
-            {modifiedNotifications?.length === 0 ? 
-            <span className='notification'>No notifications</span> : null}
+            {modifiedNotifications?.length === 0 ? (
+                <span className='notification'>No notifications</span>
+                ) : null}
             {modifiedNotifications && modifiedNotifications.map((notification, index) => {
-                return <div key={index} className={notification.isRead ? 'notification' : 'notification not-read'}>
+                return (
+                    <div 
+                        key={index} 
+                        className={notification.isRead ? "notification" : "notification not-read"}
+                        onClick={() => {
+                            markNotificationAsRead(notification, userChats, user, notifications)
+                            setIsOpen(false)
+                        }}
+                    >
                         <span>{`${notification.senderName} sent you a message`}</span>
                         <span className='notification-time'>{moment(notification.date).calendar()}</span>
                     </div>
+                )
             })}
-        </div> : null}
-        
+        </div>
+        ) : null}        
     </div>
   )
 }
