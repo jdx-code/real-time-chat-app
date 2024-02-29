@@ -20,9 +20,7 @@ export const ChatContextProvider = ({ children, user }) => {
     const [socket, setSocket] = useState(null)
     const [onlineUsers, setOnlineUsers] = useState([])
     const [notifications, setNotifications] = useState([])
-    const [allUsers, setAllUsers] = useState([])
-
-    console.log(notifications)
+    const [allUsers, setAllUsers] = useState([])    
 
     useEffect(() => {
         const newSocket = io("http://localhost:3000/")
@@ -69,7 +67,7 @@ export const ChatContextProvider = ({ children, user }) => {
         socket.on("getNotification", (res) => {
             const isChatOpen = currentChat?.members.some(id => id === res.senderId)
             if(isChatOpen) {
-                setNotifications(prev => [{...res, isRead:true}, ...prev])
+                setNotifications(prev => [{...res, isRead:true}])
             } else {
                 setNotifications(prev => [res, ...prev])
             }
@@ -225,6 +223,26 @@ export const ChatContextProvider = ({ children, user }) => {
         setNotifications(modifiedNotifications)
     }, [])
 
+    const markThisUserNotificationsAsRead = useCallback((thisUserNotifications, notifications) => {
+        // mark notifications as read
+        const modifiedNotifications = notifications.map(el => {
+            let notification
+
+            thisUserNotifications.forEach(n => {
+                if(n.senderId === el.senderId) {
+                    notification = {...n, isRead: true}
+                } else {
+                    notification = el
+                }
+            })
+
+            return notification
+        })
+
+        setNotifications(modifiedNotifications)
+
+    }, [])
+
     return (
         <ChatContext.Provider 
             value={{
@@ -244,6 +262,7 @@ export const ChatContextProvider = ({ children, user }) => {
                 allUsers,
                 markAllNotificationsAsRead,
                 markNotificationAsRead,
+                markThisUserNotificationsAsRead,
             }}
         >
             {children}
